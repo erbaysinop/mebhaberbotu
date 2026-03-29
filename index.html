@@ -1,13 +1,14 @@
+<!DOCTYPE html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <title>MEB Gelişmiş Haber Manşet Botu</title>
+    
     <link rel="stylesheet" href="owl.carousel.min.css">
-    <script src="jquery.min.js"></script>
-    <script src="owl.carousel.min.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    
     <style>       
-   
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         
         /* ÜST BAR */
@@ -30,7 +31,7 @@
         #eb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 2999; backdrop-filter: blur(5px); }
         #eb-code-area { width: 100%; height: 100px; background: #000; border: 1px solid #444; color: #0f0; font-family: monospace; font-size: 11px; padding: 10px; margin: 15px 0; border-radius: 8px; resize: none; outline: none; }
 
-        /* ANA YERLEŞİM (Senin Orijinal CSS) */
+        /* ANA YERLEŞİM */
         #eb-slider, .owl-stage-outer, .owl-item, .item { height: 100vh !important; }
         .item { position: relative; background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; }
         .item img { width: 100%; height: 100% !important; object-fit: cover; }
@@ -38,12 +39,13 @@
         .eb-badge { display: flex; align-items: center; margin-bottom: 15px; width: fit-content; animation: slideUp 0.5s ease; }
         .eb-cap span:not(.school-name-text):not(.news-label-text) { font-size: 28px; font-weight: 700; line-height: 1.3; text-shadow: 0 4px 12px rgba(0,0,0,1); display: block; max-width: 1100px; animation: slideUp 0.7s ease; }
         .news-label-text::before { content: ''; display: inline-block; width: 7px; height: 7px; background-color: #2ecc71; border-radius: 50%; margin-right: 6px; animation: pulse-green 2s infinite; }
+        
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* MOBİL ÖZEL AYARLAR */
         @media (max-width: 640px) {
-            #eb-top-bar { width: auto; max-width: 250px; padding: 6px 4px; }
+            #eb-top-bar { width: auto; max-width: 320px; padding: 6px 8px; }
             .item { flex-direction: column; align-items: flex-start; justify-content: flex-start; height: 100vh; }
             .item img { height: 55vh !important; object-fit: contain !important; margin-top: 20px; width: 100%; }
             .eb-cap { position: relative; margin-top: 30px; padding: 0 20px 20px; background: transparent; flex-grow: 1; }
@@ -55,22 +57,10 @@
         #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; align-items: center; justify-content: center; color: #fff; flex-direction: column; }
         .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top-color: #d32f2f; border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
         .owl-nav button { position: absolute; top: 50%; transform: translateY(-50%); font-size: 35px !important; color: #fff !important; padding: 15px !important; background: rgba(0,0,0,0.2) !important; border-radius: 50%; }
         .owl-prev { left: 20px; } .owl-next { right: 20px; }
     </style>
-    <script>
-$(document).ready(function(){
-  // Slider'ı başlatan ana komut
-  $(".owl-carousel").owlCarousel({
-    items: 1,
-    loop: true,
-    autoplay: true,
-    autoplayTimeout: 5000,
-    nav: true,
-    dots: true
-  });
-});
-</script>
 </head>
 
 <body>
@@ -95,6 +85,9 @@ $(document).ready(function(){
 <div id="loader"><div class="spinner"></div></div>
 <div id="eb-slider" class="owl-carousel"></div>
 
+<script src="jquery.min.js"></script>
+<script src="owl.carousel.min.js"></script>
+
 <script>
     const PROXY_URL = "https://script.google.com/macros/s/AKfycbz7Cur6ko0XCniwQyxdRfZ1AdUm0MQ4cLHLS2XKxGjEM1r83BAk8okzPY98UIPafVr9/exec?url=";
     let fadeTimeout;
@@ -103,28 +96,27 @@ $(document).ready(function(){
 
     // --- EMBED FONKSİYONLARI ---
     function embedKoduAl() {
-    let base = window.location.href.split('?')[0];
-    let fullUrl = base.substring(0, base.lastIndexOf('/')) + "/habercek.html";    
+        let base = window.location.href.split('?')[0];
+        let link = $('#targetUrl').val();
+        let code = `<iframe src="${base}?link=${link}" style="width:100%;height:100vh;border:none;" allowfullscreen></iframe>`;
+        
+        $('#eb-code-area').val(code);
+        $('#eb-overlay, #eb-popup').fadeIn();
+    }
 
-    let link = $('#targetUrl').val();
-    let code = `<iframe src="${fullUrl}?link=${link}" style="width:100%;height:100vh;border:none;" allowfullscreen></iframe>`;
-    
-    $('#eb-code-area').val(code);
-    $('#eb-overlay, #eb-popup').fadeIn();
-}
     function kopyalaVeKapat() {
-    let copyText = document.getElementById("eb-code-area");   
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); // Mobil cihazlar için
-    navigator.clipboard.writeText(copyText.value);    
-    $('#eb-overlay, #eb-popup').fadeOut();
-}
+        let copyText = document.getElementById("eb-code-area");   
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); 
+        navigator.clipboard.writeText(copyText.value);      
+        $('#eb-overlay, #eb-popup').fadeOut();
+    }
 
-function sadeceKapat() {
-    $('#eb-overlay, #eb-popup').fadeOut();
-}
+    function sadeceKapat() {
+        $('#eb-overlay, #eb-popup').fadeOut();
+    }
 
-    // --- SENİN ORİJİNAL ÇALIŞAN MANTIĞIN (DEĞİŞTİRİLMEDİ) ---
+    // --- SENİN ORİJİNAL ÇALIŞAN MANTIĞIN ---
     function checkUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         let link = urlParams.get('link') || urlParams.get('okul');
@@ -210,19 +202,6 @@ function sadeceKapat() {
                     });
                 }
 
-                if (results.length === 0) {
-                    doc.querySelectorAll('li, .item, .slide, .swiper-slide').forEach(container => {
-                        const img = container.querySelector('img');
-                        if (img) {
-                            let src = img.getAttribute('src') || img.getAttribute('data-src');
-                            if (src && (src.includes('slider') || src.includes('manset') || src.includes('resim'))) {
-                                let title = container.querySelector('h1, h2, h3, .title, span')?.innerText || img.getAttribute('alt') || "";
-                                if (!forbidden.some(k => src.toLowerCase().includes(k)) && title.length > 2) results.push({ img: src, title: title });
-                            }
-                        }
-                    });
-                }
-
                 const uniqueResults = [];
                 const seenUrls = new Set();
                 const limit = inputUrl.includes('meb.gov.tr') ? 10 : 5;
@@ -264,5 +243,6 @@ function sadeceKapat() {
         fetchNews();
     });
 </script>
+
 </body>
 </html>
