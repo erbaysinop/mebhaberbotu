@@ -58,7 +58,21 @@
         .owl-nav button { position: absolute; top: 50%; transform: translateY(-50%); font-size: 35px !important; color: #fff !important; padding: 15px !important; background: rgba(0,0,0,0.2) !important; border-radius: 50%; }
         .owl-prev { left: 20px; } .owl-next { right: 20px; }
     </style>
+    <script>
+$(document).ready(function(){
+  // Slider'ı başlatan ana komut
+  $(".owl-carousel").owlCarousel({
+    items: 1,
+    loop: true,
+    autoplay: true,
+    autoplayTimeout: 5000,
+    nav: true,
+    dots: true
+  });
+});
+</script>
 </head>
+
 <body>
 
 <div id="eb-top-bar">
