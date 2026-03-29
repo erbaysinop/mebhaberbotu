@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <title>MEB Gelişmiş Haber Manşet Botu</title>    
+    
     <link rel="stylesheet" href="owl.carousel.min.css">
-    <script src="jquery.min.js"></script>
-    <script src="owl.carousel.min.js"></script>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-                /* ANA YERLEŞİM - ÜSTE SIFIRLANDI */
         #eb-slider, .owl-stage-outer, .owl-item, .item { height: 100vh !important; }
         .item { position: relative; background: #000; display: flex; align-items: flex-start; justify-content: center; height: 100vh; }
-        .item img { width: 100%; height: 100% !important; object-fit: cover; display: block; margin-top: 0 !important; }
+        .item img { width: 100%; height: 100% !important; object-fit: cover; display: block; }
 
         .eb-cap {
             position: absolute; bottom: 0; left: 0; right: 0;
@@ -21,18 +20,20 @@
             background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 45%, transparent 100%);
             color: #fff; pointer-events: none;
             display: flex; flex-direction: column;
+            z-index: 10;
         }
 
-        .eb-badge { display: flex; align-items: center; margin-bottom: 15px; width: fit-content; animation: slideUp 0.5s ease; }
+        .eb-badge { display: flex; align-items: center; margin-bottom: 15px; width: fit-content; }
+        
         .eb-cap span:not(.school-name-text):not(.news-label-text) { 
             font-size: 28px; font-weight: 700; line-height: 1.3; 
             text-shadow: 0 4px 12px rgba(0,0,0,1); display: block; 
-            max-width: 1100px; animation: slideUp 0.7s ease;
+            max-width: 1100px;
         }
 
         .news-label-text::before {
-            content: ''; display: inline-block; width: 7px; height: 7px;
-            background-color: #2ecc71; border-radius: 50%; margin-right: 6px;
+            content: ''; display: inline-block; width: 10px; height: 10px;
+            background-color: #2ecc71; border-radius: 50%; margin-right: 8px;
             animation: pulse-green 2s infinite;
         }
 
@@ -41,49 +42,37 @@
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MOBİL ÖZEL AYARLAR - ÜSTE SIFIRLANDI */
         @media (max-width: 640px) {
-            .item { flex-direction: column; align-items: flex-start; justify-content: flex-start; height: 100vh; }
-            .item img { height: 55vh !important; object-fit: cover !important; margin-top: 0 !important; width: 100%; }
-            .eb-cap { position: relative; margin-top: 0; padding: 20px 20px 20px; background: transparent; flex-grow: 1; }
-            .eb-cap span:not(.school-name-text):not(.news-label-text) { font-size: 20px !important; text-shadow: none; line-height: 1.2; }
-            .school-name-text { display: none !important; }
-            .owl-nav button { display: none !important; }
+            .item { flex-direction: column; }
+            .item img { height: 50vh !important; }
+            .eb-cap { position: relative; padding: 20px; background: #000; height: 50vh; justify-content: flex-start; }
+            .eb-cap span:not(.school-name-text):not(.news-label-text) { font-size: 20px !important; }
+            .owl-nav { display: none !important; }
         }
 
-        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; align-items: center; justify-content: center; color: #fff; flex-direction: column; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top-color: #d32f2f; border-radius: 50%; animation: spin 1s infinite linear; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .owl-nav button { position: absolute; top: 50%; transform: translateY(-50%); font-size: 35px !important; color: #fff !important; padding: 15px !important; background: rgba(0,0,0,0.2) !important; border-radius: 50%; }
+
+        .owl-nav button { position: absolute; top: 50%; transform: translateY(-50%); font-size: 40px !important; color: #fff !important; background: rgba(0,0,0,0.3) !important; width: 60px; height: 60px; border-radius: 50% !important; z-index: 100; }
         .owl-prev { left: 20px; } .owl-next { right: 20px; }
     </style>
-    <script>
-$(document).ready(function(){
-  // Slider'ı başlatan ana komut
-  $(".owl-carousel").owlCarousel({
-    items: 1,
-    loop: true,
-    autoplay: true,
-    autoplayTimeout: 5000,
-    nav: true,
-    dots: true
-  });
-});
-</script>
 </head>
+
 <body>
 
 <div id="loader"><div class="spinner"></div></div>
 <div id="eb-slider" class="owl-carousel"></div>
 
+<script src="jquery.min.js"></script>
+<script src="owl.carousel.min.js"></script>
+
 <script>
     const PROXY_URL = "https://script.google.com/macros/s/AKfycbz7Cur6ko0XCniwQyxdRfZ1AdUm0MQ4cLHLS2XKxGjEM1r83BAk8okzPY98UIPafVr9/exec?url=";
     let currentSchoolName = "OKUL ADI";
-    let targetUrl = "https://sinop.meb.gov.tr"; // Varsayılan
+    let targetUrl = "https://sinop.meb.gov.tr"; 
 
-    // --- URL PARAMETRESİNİ ALAN FONKSİYON ---
     function checkUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         let link = urlParams.get('link') || urlParams.get('okul');
@@ -101,65 +90,46 @@ $(document).ready(function(){
                 let namePart = title.split('-')[1];
                 if (namePart.includes('|')) namePart = namePart.split('|')[0];
                 return namePart.trim();
-            } else if (title.includes('|')) {
-                return title.split('|')[0].trim();
             }
-            return title.trim();
+            return title.split('|')[0].trim();
         } catch(e) { return "OKUL ADI"; }
     }
 
-    // --- SENİN VERİ ÇEKME MANTIĞIN (DOKUNULMADI) ---
     function fetchNews() {
-        let inputUrl = targetUrl;
-        
         $('#loader').css('display', 'flex');
-        const baseUrl = new URL(inputUrl).origin + '/';
-        const finalRequestUrl = PROXY_URL + encodeURIComponent(inputUrl);
+        const baseUrl = new URL(targetUrl).origin + '/';
+        const finalRequestUrl = PROXY_URL + encodeURIComponent(targetUrl);
 
         fetch(finalRequestUrl)
             .then(response => response.text())
             .then(htmlContent => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlContent, 'text/html');
-                
                 currentSchoolName = extractSchoolName(doc);
                 let results = [];
                 const forbidden = ['logo', 'icon', 'sosyal', 'v3', 'favicon', 'banner', 'button', 'btn', 'social'];
 
+                // MEB Özel Seçiciler
                 const selviSlides = doc.querySelectorAll('.ws_images ul li');
                 selviSlides.forEach(li => {
-                    const allImages = li.querySelectorAll('image, img');
-                    let validImg = null;
+                    const img = li.querySelector('img, image');
                     let title = li.querySelector('span')?.innerText || li.getAttribute('title') || "";
-                    allImages.forEach(img => {
-                        const href = img.getAttribute('xlink:href') || img.getAttribute('src') || img.getAttribute('href');
-                        if (href && (href.includes('meb_iys_dosyalar') || href.includes('resimler') || href.includes('upload'))) {
-                            if (!forbidden.some(k => href.toLowerCase().includes(k))) validImg = href;
+                    if (img) {
+                        let src = img.getAttribute('src') || img.getAttribute('xlink:href');
+                        if (src && !forbidden.some(k => src.toLowerCase().includes(k))) {
+                            results.push({ img: src, title: title });
                         }
-                    });
-                    if (validImg && title.length > 2) results.push({ img: validImg, title: title });
+                    }
                 });
 
                 if (results.length === 0) {
-                    const imageEls = doc.querySelectorAll('#resim li img, #resim img, .swiper-slide img, .manset-resim img');
-                    const textEls = doc.querySelectorAll('#yazi li, .swiper-slide .title, .news-title');
-                    imageEls.forEach((img, index) => {
-                        let src = img.getAttribute('src') || img.getAttribute('data-src');
-                        if (src && (src.includes('meb_iys_dosyalar') || src.includes('resim') || src.includes('upload'))) {
-                            let detectedTitle = textEls[index] ? textEls[index].innerText : (img.getAttribute('alt') || img.getAttribute('title') || "");
-                            if (!forbidden.some(k => src.toLowerCase().includes(k)) && detectedTitle.length > 2) results.push({ img: src, title: detectedTitle });
-                        }
-                    });
-                }
-
-                if (results.length === 0) {
-                    doc.querySelectorAll('li, .item, .slide, .swiper-slide').forEach(container => {
-                        const img = container.querySelector('img');
+                    doc.querySelectorAll('.swiper-slide, .item, .manset-resim').forEach(el => {
+                        const img = el.querySelector('img');
                         if (img) {
                             let src = img.getAttribute('src') || img.getAttribute('data-src');
-                            if (src && (src.includes('slider') || src.includes('manset') || src.includes('resim'))) {
-                                let title = container.querySelector('h1, h2, h3, .title, span')?.innerText || img.getAttribute('alt') || "";
-                                if (!forbidden.some(k => src.toLowerCase().includes(k)) && title.length > 2) results.push({ img: src, title: title });
+                            let title = el.innerText || img.getAttribute('alt') || "";
+                            if (src && src.includes('meb_iys_dosyalar') && title.length > 2) {
+                                results.push({ img: src, title: title });
                             }
                         }
                     });
@@ -167,36 +137,37 @@ $(document).ready(function(){
 
                 const uniqueResults = [];
                 const seenUrls = new Set();
-                const limit = inputUrl.includes('meb.gov.tr') ? 10 : 5;
                 for (let item of results) {
-                    if (uniqueResults.length >= limit) break; 
+                    if (uniqueResults.length >= 10) break;
                     if (!seenUrls.has(item.img)) { seenUrls.add(item.img); uniqueResults.push(item); }
                 }
                 initSlider(uniqueResults, baseUrl);
             })
-            .catch(error => { $('#loader').hide(); alert("Veri çekilemedi."); });
+            .catch(() => { $('#loader').hide(); alert("Veri çekilemedi."); });
     }
 
     function initSlider(dataList, base) {
         const sliderContainer = $('#eb-slider');
-        sliderContainer.trigger('destroy.owl.carousel').empty();
         let finalHtml = '';
-        let validItemCount = 0;
-
         dataList.forEach(newsItem => {
-            if (!newsItem.img) return;
-            let fullImageUrl = newsItem.img.startsWith('http') ? newsItem.img : base + newsItem.img.replace(/^\//, '');
-            let displayTitle = (newsItem.title || "Manşet Haber").trim();
-            if (displayTitle.toLowerCase() === "haber" || displayTitle.length < 2) displayTitle = "Haber Detayı İçin Tıklayınız";
-
-            finalHtml += `<div class="item"><img src="${fullImageUrl}" onerror="this.src='https://placehold.co/1200x800/111/fff?text=Görsel+Bulunamadı'"><div class="eb-cap"><div class="eb-badge" style="background: #fff; color: #000; padding: 0 10px;"><span class="school-name-text" style="font-weight: 800; font-size: 11px;">${currentSchoolName}</span><span class="news-label-text" style="background: #d32f2f; color: #fff; padding: 4px 8px; margin-left: 10px; border-radius: 2px; font-size: 10px;">GÜNCEL HABERLER</span></div><span>${displayTitle}</span></div></div>`;
-            validItemCount++;
+            let fullImg = newsItem.img.startsWith('http') ? newsItem.img : base + newsItem.img.replace(/^\//, '');
+            finalHtml += `
+                <div class="item">
+                    <img src="${fullImg}" onerror="this.src='https://placehold.co/1200x800/111/fff?text=Görsel+Bulunamadı'">
+                    <div class="eb-cap">
+                        <div class="eb-badge" style="background:#fff; color:#000; padding:2px 10px; border-radius:4px;">
+                            <span class="school-name-text" style="font-weight:800; font-size:11px;">${currentSchoolName}</span>
+                            <span class="news-label-text" style="background:#d32f2f; color:#fff; padding:2px 8px; margin-left:10px; border-radius:2px; font-size:10px;">GÜNCEL HABERLER</span>
+                        </div>
+                        <span>${newsItem.title}</span>
+                    </div>
+                </div>`;
         });
 
         $('#loader').hide();
-        if (validItemCount > 0) {
-            sliderContainer.html(finalHtml).owlCarousel({ items: 1, loop: (validItemCount > 1), autoplay: true, autoplayTimeout: 5500, nav: true, dots: false, animateOut: 'fadeOut', animateIn: 'fadeIn', smartSpeed: 900, navText: ["❮", "❯"] });
-        } else { alert("İçerik bulunamadı."); }
+        sliderContainer.html(finalHtml).owlCarousel({
+            items: 1, loop: true, autoplay: true, autoplayTimeout: 5500, nav: true, dots: false, animateOut: 'fadeOut', animateIn: 'fadeIn', navText: ["❮", "❯"]
+        });
     }
 
     $(document).ready(function() {
